@@ -1,0 +1,26 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+
+    <!-- OneUI 8 Style: Bold, Clean, Slightly curved glyph -->
+    <!-- Shadow for depth -->
+    <path
+        android:fillColor="#22000000"
+        android:pathData="M31,38 C31,35 34,34 36,35 L82,53 C85,54 85,58 82,59 L36,77 C34,78 31,77 31,74 L40,56 Z" />
+
+    <!-- Main White Glyph -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M30,37 C30,34 33,33 35,34 L81,52 C84,53 84,57 81,58 L35,76 C33,77 30,76 30,73 L39,55 Z" />
+
+    <!-- Accent Line -->
+    <path
+        android:pathData="M39,55 L81,55"
+        android:strokeColor="#2563eb"
+        android:strokeWidth="3"
+        android:strokeLineCap="round"
+        android:alpha="0.2" />
+
+</vector>
