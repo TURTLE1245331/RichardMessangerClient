@@ -41,12 +41,19 @@ fun RichardMessengerApp(viewModel: AppViewModel) {
                 is AppScreen.Setup -> SetupScreen(
                     onServerIpSubmit = viewModel::onServerIpSubmit,
                     onLanguageSelect = viewModel::onLanguageSelect,
-                    initialLanguage = language
+                    initialLanguage = language,
+                    theme = theme,
+                    onThemeChange = viewModel::onThemeChange,
+                    primaryColor = primaryColor,
+                    onPrimaryColorChange = viewModel::onPrimaryColorChange,
+                    backgroundColor = backgroundColor,
+                    onBackgroundColorChange = viewModel::onBackgroundColorChange
                 )
                 is AppScreen.Login -> LoginScreen(
                     onLoginSubmit = { u, p, error -> viewModel.onLoginSubmit(u, p, error) },
                     onGoToRegister = viewModel::goToRegister,
                     onChangeServer = viewModel::goToSetup,
+                    onOpenSettings = { viewModel.openSettings(isFull = false) },
                     language = language
                 )
                 is AppScreen.Register -> {
@@ -67,10 +74,12 @@ fun RichardMessengerApp(viewModel: AppViewModel) {
                         onSendMessage = viewModel::sendMessage,
                         onLogout = viewModel::onLogout,
                         onOpenSettings = viewModel::openSettings,
-                        language = language
+                        language = language,
+                        enterToSend = viewModel.enterToSend.collectAsState().value
                     )
                 }
                 is AppScreen.Settings -> {
+                    val settingsScreen = appScreen as AppScreen.Settings
                     org.turtledev.richard.ui.screens.SettingsScreen(
                         currentUsername = viewModel.currentUsername,
                         onClose = viewModel::closeSettings,
@@ -82,7 +91,12 @@ fun RichardMessengerApp(viewModel: AppViewModel) {
                         primaryColor = primaryColor,
                         onPrimaryColorChange = viewModel::onPrimaryColorChange,
                         backgroundColor = backgroundColor,
-                        onBackgroundColorChange = viewModel::onBackgroundColorChange
+                        onBackgroundColorChange = viewModel::onBackgroundColorChange,
+                        enterToSend = viewModel.enterToSend.collectAsState().value,
+                        onEnterToSendChange = viewModel::onEnterToSendChange,
+                        chatFontSize = viewModel.chatFontSize.collectAsState().value,
+                        onChatFontSizeChange = viewModel::onChatFontSizeChange,
+                        isFullSettings = settingsScreen.isFullSettings
                     )
                 }
             }

@@ -1,22 +1,18 @@
 package org.turtledev.richard.ui.screens
 
-import androidx.compose.animation.core.*
-import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Lock
 import androidx.compose.material.icons.filled.Person
+import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.scale
-import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
@@ -24,77 +20,53 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import org.turtledev.richard.ui.Strings
-import org.turtledev.richard.ui.theme.*
-import kotlin.math.sin
-
-@Composable
-fun AnimatedBackground() {
-    val infiniteTransition = rememberInfiniteTransition()
-    val primary = MaterialTheme.colorScheme.primary
-    val secondary = MaterialTheme.colorScheme.secondary
-    
-    val phase by infiniteTransition.animateFloat(
-        initialValue = 0f,
-        targetValue = 2f * kotlin.math.PI.toFloat(),
-        animationSpec = infiniteRepeatable(
-            animation = tween(10000, easing = LinearEasing),
-            repeatMode = RepeatMode.Restart
-        )
-    )
-
-    Canvas(modifier = Modifier.fillMaxSize()) {
-        val width = size.width
-        val height = size.height
-        
-        // Background base
-        drawRect(color = Color.Transparent) // Actual background is set in Box
-
-        // Floating blobs
-        val blob1Center = Offset(
-            x = width * (0.5f + 0.2f * sin(phase.toDouble()).toFloat()),
-            y = height * (0.3f + 0.1f * sin(phase.toDouble() * 0.5).toFloat())
-        )
-        drawCircle(
-            brush = Brush.radialGradient(
-                colors = listOf(primary.copy(alpha = 0.15f), Color.Transparent),
-                center = blob1Center,
-                radius = width * 0.6f
-            ),
-            center = blob1Center,
-            radius = width * 0.6f
-        )
-
-        val blob2Center = Offset(
-            x = width * (0.2f + 0.15f * sin(phase.toDouble() * 0.7).toFloat()),
-            y = height * (0.7f + 0.1f * sin(phase.toDouble() * 1.2).toFloat())
-        )
-        drawCircle(
-            brush = Brush.radialGradient(
-                colors = listOf(secondary.copy(alpha = 0.1f), Color.Transparent),
-                center = blob2Center,
-                radius = width * 0.5f
-            ),
-            center = blob2Center,
-            radius = width * 0.5f
-        )
-    }
-}
 
 @Composable
 fun LoginScreen(
     onLoginSubmit: (String, String, (String) -> Unit) -> Unit,
     onGoToRegister: () -> Unit,
     onChangeServer: () -> Unit,
+    onOpenSettings: () -> Unit,
     language: String
 ) {
     var username by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
     var errorText by remember { mutableStateOf("") }
+    var showResetConfirm by remember { mutableStateOf(false) }
     
     val primary = MaterialTheme.colorScheme.primary
     val secondary = MaterialTheme.colorScheme.secondary
     val logoBrush = remember(primary, secondary) { 
         Brush.linearGradient(listOf(primary, secondary)) 
+    }
+
+    if (showResetConfirm) {
+        AlertDialog(
+            onDismissRequest = { showResetConfirm = false },
+            title = { Text(Strings.get("confirm_setup_reset", language)) },
+            text = { Text(Strings.get("confirm_setup_message", language)) },
+            confirmButton = {
+                Button(
+                    onClick = {
+                        showResetConfirm = false
+                        onChangeServer()
+                    },
+                    colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary),
+                    shape = RoundedCornerShape(12.dp)
+                ) {
+                    Text(Strings.get("confirm", language))
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { showResetConfirm = false }) {
+                    Text(Strings.get("cancel", language))
+                }
+            },
+            containerColor = MaterialTheme.colorScheme.surface,
+            titleContentColor = MaterialTheme.colorScheme.onSurface,
+            textContentColor = MaterialTheme.colorScheme.onSurfaceVariant,
+            shape = RoundedCornerShape(28.dp)
+        )
     }
 
     Box(
@@ -119,15 +91,25 @@ fun LoginScreen(
             ) {
                 // Settings/IP Change Icon at top right
                 Box(modifier = Modifier.fillMaxWidth()) {
-                    IconButton(
-                        onClick = onChangeServer,
-                        modifier = Modifier.align(Alignment.TopEnd)
-                    ) {
-                        Icon(
-                            Icons.Default.Settings,
-                            contentDescription = Strings.get("server_ip_change", language),
-                            tint = MaterialTheme.colorScheme.primary
-                        )
+                    Row(modifier = Modifier.align(Alignment.TopEnd)) {
+                        IconButton(
+                            onClick = onOpenSettings,
+                        ) {
+                            Icon(
+                                Icons.Default.Settings,
+                                contentDescription = Strings.get("settings", language),
+                                tint = MaterialTheme.colorScheme.primary
+                            )
+                        }
+                        IconButton(
+                            onClick = { showResetConfirm = true },
+                        ) {
+                            Icon(
+                                Icons.Default.Refresh, // Changed icon to distinguish from general settings
+                                contentDescription = Strings.get("server_ip_change", language),
+                                tint = MaterialTheme.colorScheme.primary
+                            )
+                        }
                     }
                 }
 

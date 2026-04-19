@@ -30,6 +30,7 @@ import org.turtledev.richard.ui.theme.*
 
 enum class SetupStep {
     Language,
+    Appearance,
     ServerIp
 }
 
@@ -40,7 +41,13 @@ data class LanguageOption(val name: String, val code: String, val flag: String)
 fun SetupScreen(
     onServerIpSubmit: (String) -> Unit,
     onLanguageSelect: (String) -> Unit,
-    initialLanguage: String
+    initialLanguage: String,
+    theme: String,
+    onThemeChange: (String) -> Unit,
+    primaryColor: String,
+    onPrimaryColorChange: (String) -> Unit,
+    backgroundColor: String,
+    onBackgroundColorChange: (String) -> Unit
 ) {
     var ip by remember { mutableStateOf("") }
     var visible by remember { mutableStateOf(false) }
@@ -122,9 +129,15 @@ fun SetupScreen(
             ) {
                 Box(modifier = Modifier.fillMaxWidth()) {
                     // Back Button (Top Left)
-                    if (currentStep == SetupStep.ServerIp) {
+                    if (currentStep != SetupStep.Language) {
                         IconButton(
-                            onClick = { currentStep = SetupStep.Language },
+                            onClick = { 
+                                currentStep = when(currentStep) {
+                                    SetupStep.Appearance -> SetupStep.Language
+                                    SetupStep.ServerIp -> SetupStep.Appearance
+                                    else -> SetupStep.Language
+                                }
+                            },
                             modifier = Modifier
                                 .align(Alignment.TopStart)
                                 .padding(8.dp)
@@ -204,6 +217,75 @@ fun SetupScreen(
                                         
                                         Spacer(Modifier.height(24.dp))
                                         
+                                        Button(
+                                            onClick = { currentStep = SetupStep.Appearance },
+                                            modifier = Modifier.fillMaxWidth().height(56.dp),
+                                            shape = RoundedCornerShape(16.dp),
+                                            colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary)
+                                        ) {
+                                            Text(Strings.get("next", selectedLanguage.code), fontWeight = FontWeight.Bold)
+                                            Spacer(Modifier.width(8.dp))
+                                            Icon(Icons.AutoMirrored.Filled.ArrowForward, null, Modifier.size(18.dp))
+                                        }
+                                    }
+                                    SetupStep.Appearance -> {
+                                        Text(
+                                            Strings.get("appearance", selectedLanguage.code),
+                                            style = MaterialTheme.typography.headlineMedium.copy(
+                                                fontWeight = FontWeight.ExtraBold,
+                                                letterSpacing = 1.sp
+                                            ),
+                                            color = MaterialTheme.colorScheme.onSurface
+                                        )
+                                        
+                                        Spacer(Modifier.height(24.dp))
+
+                                        Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
+                                            // Theme Selection
+                                            Text(Strings.get("theme", selectedLanguage.code), style = MaterialTheme.typography.titleSmall)
+                                            Row(
+                                                modifier = Modifier.fillMaxWidth(),
+                                                horizontalArrangement = Arrangement.spacedBy(8.dp)
+                                            ) {
+                                                ThemeOption(
+                                                    text = Strings.get("theme_system", selectedLanguage.code),
+                                                    isSelected = theme == "system",
+                                                    onClick = { onThemeChange("system") },
+                                                    modifier = Modifier.weight(1f)
+                                                )
+                                                ThemeOption(
+                                                    text = Strings.get("theme_light", selectedLanguage.code),
+                                                    isSelected = theme == "light",
+                                                    onClick = { onThemeChange("light") },
+                                                    modifier = Modifier.weight(1f)
+                                                )
+                                                ThemeOption(
+                                                    text = Strings.get("theme_dark", selectedLanguage.code),
+                                                    isSelected = theme == "dark",
+                                                    onClick = { onThemeChange("dark") },
+                                                    modifier = Modifier.weight(1f)
+                                                )
+                                            }
+
+                                            Spacer(Modifier.height(8.dp))
+
+                                            // Color Selection
+                                            Text(Strings.get("primary_color", selectedLanguage.code), style = MaterialTheme.typography.titleSmall)
+                                            Row(
+                                                modifier = Modifier.fillMaxWidth(),
+                                                horizontalArrangement = Arrangement.SpaceBetween,
+                                                verticalAlignment = Alignment.CenterVertically
+                                            ) {
+                                                ColorCircle("blue", Color(0xFF2563eb), primaryColor == "blue", onPrimaryColorChange)
+                                                ColorCircle("green", Color(0xFF22c55e), primaryColor == "green", onPrimaryColorChange)
+                                                ColorCircle("purple", Color(0xFFa855f7), primaryColor == "purple", onPrimaryColorChange)
+                                                ColorCircle("orange", Color(0xFFf97316), primaryColor == "orange", onPrimaryColorChange)
+                                                ColorCircle("pink", Color(0xFFec4899), primaryColor == "pink", onPrimaryColorChange)
+                                            }
+                                        }
+
+                                        Spacer(Modifier.height(32.dp))
+
                                         Button(
                                             onClick = { currentStep = SetupStep.ServerIp },
                                             modifier = Modifier.fillMaxWidth().height(56.dp),

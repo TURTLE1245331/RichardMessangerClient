@@ -41,7 +41,8 @@ fun SettingsScreen(
     enterToSend: Boolean,
     onEnterToSendChange: (Boolean) -> Unit,
     chatFontSize: String,
-    onChatFontSizeChange: (String) -> Unit
+    onChatFontSizeChange: (String) -> Unit,
+    isFullSettings: Boolean = true
 ) {
     var newUsername by remember { mutableStateOf(currentUsername) }
     var newPassword by remember { mutableStateOf("") }
@@ -306,100 +307,74 @@ fun SettingsScreen(
             }
 
             // --- SECTION: PROFIL ---
-            SettingsSection(title = Strings.get("profile", language)) {
-                Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
-                    OutlinedTextField(
-                        value = newUsername,
-                        onValueChange = { newUsername = it },
-                        label = { Text(Strings.get("username", language)) },
-                        modifier = Modifier.fillMaxWidth(),
-                        shape = RoundedCornerShape(12.dp),
-                        enabled = !isAdmin
-                    )
+            if (isFullSettings) {
+                SettingsSection(title = Strings.get("profile", language)) {
+                    Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+                        OutlinedTextField(
+                            value = newUsername,
+                            onValueChange = { newUsername = it },
+                            label = { Text(Strings.get("username", language)) },
+                            modifier = Modifier.fillMaxWidth(),
+                            shape = RoundedCornerShape(12.dp),
+                            enabled = !isAdmin
+                        )
 
-                    OutlinedTextField(
-                        value = newPassword,
-                        onValueChange = { newPassword = it },
-                        label = { Text(Strings.get("new_password", language)) },
-                        placeholder = { Text(Strings.get("password_hint", language)) },
-                        visualTransformation = PasswordVisualTransformation(),
-                        modifier = Modifier.fillMaxWidth(),
-                        shape = RoundedCornerShape(12.dp),
-                        enabled = !isAdmin
-                    )
+                        OutlinedTextField(
+                            value = newPassword,
+                            onValueChange = { newPassword = it },
+                            label = { Text(Strings.get("new_password", language)) },
+                            placeholder = { Text(Strings.get("password_hint", language)) },
+                            visualTransformation = PasswordVisualTransformation(),
+                            modifier = Modifier.fillMaxWidth(),
+                            shape = RoundedCornerShape(12.dp),
+                            enabled = !isAdmin
+                        )
 
-                    Button(
-                        onClick = { onSaveProfile(newUsername, newPassword) },
-                        modifier = Modifier.fillMaxWidth().height(56.dp),
-                        shape = RoundedCornerShape(16.dp),
-                        enabled = !isAdmin
-                    ) {
-                        Text(Strings.get("save", language), style = MaterialTheme.typography.labelLarge)
-                    }
+                        Button(
+                            onClick = { onSaveProfile(newUsername, newPassword) },
+                            modifier = Modifier.fillMaxWidth().height(56.dp),
+                            shape = RoundedCornerShape(16.dp),
+                            enabled = !isAdmin
+                        ) {
+                            Text(Strings.get("save", language), style = MaterialTheme.typography.labelLarge)
+                        }
 
-                    if (isAdmin) {
-                        Text(
-                            Strings.get("admin_info", language),
-                            color = MaterialTheme.colorScheme.primary,
-                            style = MaterialTheme.typography.bodySmall,
-                            modifier = Modifier.padding(top = 4.dp)
-                        )
-                    }
-                    
-                    HorizontalDivider(modifier = Modifier.padding(vertical = 16.dp), color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.5f))
-                    
-                    // Chat Font Size
-                    Text(Strings.get("chat_font_size", language), style = MaterialTheme.typography.titleSmall)
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.spacedBy(8.dp)
-                    ) {
-                        ThemeOption(
-                            text = Strings.get("font_size_small", language),
-                            isSelected = chatFontSize == "small",
-                            onClick = { onChatFontSizeChange("small") },
-                            modifier = Modifier.weight(1f)
-                        )
-                        ThemeOption(
-                            text = Strings.get("font_size_medium", language),
-                            isSelected = chatFontSize == "medium",
-                            onClick = { onChatFontSizeChange("medium") },
-                            modifier = Modifier.weight(1f)
-                        )
-                        ThemeOption(
-                            text = Strings.get("font_size_large", language),
-                            isSelected = chatFontSize == "large",
-                            onClick = { onChatFontSizeChange("large") },
-                            modifier = Modifier.weight(1f)
-                        )
+                        if (isAdmin) {
+                            Text(
+                                Strings.get("admin_info", language),
+                                color = MaterialTheme.colorScheme.primary,
+                                style = MaterialTheme.typography.bodySmall,
+                                modifier = Modifier.padding(top = 4.dp)
+                            )
+                        }
                     }
                 }
-            }
 
-            // --- SECTION: DANGER ZONE ---
-            SettingsSection(title = Strings.get("danger_zone", language), titleColor = MaterialTheme.colorScheme.error) {
-                Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
-                    Text(
-                        Strings.get("danger_desc", language),
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                        style = MaterialTheme.typography.bodyMedium
-                    )
-
-                    Button(
-                        onClick = { showDeleteConfirm = true },
-                        modifier = Modifier.fillMaxWidth().height(56.dp),
-                        shape = RoundedCornerShape(16.dp),
-                        enabled = !isAdmin,
-                        colors = ButtonDefaults.buttonColors(
-                            containerColor = MaterialTheme.colorScheme.errorContainer.copy(alpha = 0.5f),
-                            contentColor = MaterialTheme.colorScheme.onErrorContainer,
-                            disabledContainerColor = MaterialTheme.colorScheme.surfaceVariant,
-                            disabledContentColor = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.38f)
+                // --- SECTION: DANGER ZONE ---
+                SettingsSection(title = Strings.get("danger_zone", language), titleColor = MaterialTheme.colorScheme.error) {
+                    Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+                        Text(
+                            Strings.get("danger_desc", language),
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            style = MaterialTheme.typography.bodyMedium
                         )
-                    ) {
-                        Icon(Icons.Default.Delete, null, modifier = Modifier.size(18.dp))
-                        Spacer(Modifier.width(8.dp))
-                        Text(Strings.get("delete_account", language), style = MaterialTheme.typography.labelLarge)
+
+                        Button(
+                            onClick = { showDeleteConfirm = true },
+                            modifier = Modifier.fillMaxWidth().height(56.dp),
+                            shape = RoundedCornerShape(16.dp),
+                            enabled = !isAdmin,
+                            colors = ButtonDefaults.buttonColors(
+                                containerColor = MaterialTheme.colorScheme.errorContainer.copy(alpha = 0.5f),
+                                contentColor = MaterialTheme.colorScheme.onErrorContainer,
+                                disabledContainerColor = MaterialTheme.colorScheme.surfaceVariant,
+                                disabledContentColor = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.38f)
+                            )
+                        ) {
+                            Icon(Icons.Default.Delete, null, modifier = Modifier.size(18.dp))
+                            Spacer(Modifier.width(8.dp))
+                            Text(Strings.get("delete_account", language), style = MaterialTheme.typography.labelLarge)
+                        }
                     }
                 }
             }
@@ -426,12 +401,13 @@ fun SettingsScreen(
             title = { Text(Strings.get("delete_confirm_title", language)) },
             text = { Text(Strings.get("delete_confirm_text", language)) },
             confirmButton = {
-                TextButton(
+                Button(
                     onClick = {
                         onDeleteAccount()
                         showDeleteConfirm = false
                     },
-                    colors = ButtonDefaults.textButtonColors(contentColor = MaterialTheme.colorScheme.error)
+                    colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.error),
+                    shape = RoundedCornerShape(12.dp)
                 ) {
                     Text(Strings.get("delete", language))
                 }
@@ -494,6 +470,32 @@ fun SettingsScreen(
             textContentColor = MaterialTheme.colorScheme.onSurfaceVariant,
             shape = RoundedCornerShape(28.dp)
         )
+    }
+}
+
+@Composable
+fun SettingsSection(
+    title: String,
+    titleColor: Color = MaterialTheme.colorScheme.primary,
+    content: @Composable () -> Unit
+) {
+    Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
+        Text(
+            text = title.uppercase(),
+            color = titleColor,
+            style = MaterialTheme.typography.labelLarge,
+            letterSpacing = 1.sp
+        )
+        Card(
+            modifier = Modifier.fillMaxWidth(),
+            shape = RoundedCornerShape(20.dp),
+            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.4f)),
+            elevation = CardDefaults.cardElevation(defaultElevation = 0.dp)
+        ) {
+            Box(modifier = Modifier.padding(20.dp)) {
+                content()
+            }
+        }
     }
 }
 
@@ -563,72 +565,4 @@ fun ColorPickerDialog(
             }
         }
     )
-}
-
-@Composable
-fun ThemeOption(
-    text: String,
-    isSelected: Boolean,
-    onClick: () -> Unit,
-    modifier: Modifier = Modifier
-) {
-    Surface(
-        onClick = onClick,
-        modifier = modifier.height(40.dp),
-        shape = RoundedCornerShape(8.dp),
-        color = if (isSelected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.surfaceVariant,
-        contentColor = if (isSelected) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.onSurfaceVariant
-    ) {
-        Box(contentAlignment = Alignment.Center) {
-            Text(text, style = MaterialTheme.typography.labelMedium)
-        }
-    }
-}
-
-@Composable
-fun ColorCircle(
-    name: String,
-    color: Color,
-    isSelected: Boolean,
-    onClick: (String) -> Unit
-) {
-    Box(
-        modifier = Modifier
-            .size(40.dp)
-            .clip(CircleShape)
-            .background(color)
-            .clickable { onClick(name) }
-            .padding(2.dp),
-        contentAlignment = Alignment.Center
-    ) {
-        if (isSelected) {
-            Icon(Icons.Default.Check, null, tint = Color.White, modifier = Modifier.size(24.dp))
-        }
-    }
-}
-
-@Composable
-fun SettingsSection(
-    title: String,
-    titleColor: Color = MaterialTheme.colorScheme.primary,
-    content: @Composable () -> Unit
-) {
-    Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
-        Text(
-            text = title.uppercase(),
-            color = titleColor,
-            style = MaterialTheme.typography.labelLarge,
-            letterSpacing = 1.sp
-        )
-        Card(
-            modifier = Modifier.fillMaxWidth(),
-            shape = RoundedCornerShape(20.dp),
-            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.4f)),
-            elevation = CardDefaults.cardElevation(defaultElevation = 0.dp)
-        ) {
-            Box(modifier = Modifier.padding(20.dp)) {
-                content()
-            }
-        }
-    }
 }

@@ -14,7 +14,7 @@ sealed class AppScreen {
     object Setup : AppScreen()
     object Login : AppScreen()
     object Chat : AppScreen()
-    object Settings : AppScreen()
+    data class Settings(val isFullSettings: Boolean) : AppScreen()
     object Register : AppScreen()
 }
 
@@ -84,8 +84,19 @@ class AppViewModel {
     }
 
     // --- Navigation ---
-    fun openSettings() { _appScreen.value = AppScreen.Settings }
-    fun closeSettings() { _appScreen.value = AppScreen.Chat }
+    fun openSettings(isFull: Boolean = true) { _appScreen.value = AppScreen.Settings(isFull) }
+    fun closeSettings() {
+        val current = _appScreen.value
+        if (current is AppScreen.Settings) {
+            if (current.isFullSettings) {
+                _appScreen.value = AppScreen.Chat
+            } else {
+                _appScreen.value = AppScreen.Login
+            }
+        } else {
+            _appScreen.value = AppScreen.Login
+        }
+    }
     fun goToRegister() { _appScreen.value = AppScreen.Register }
     fun goToLogin() { _appScreen.value = AppScreen.Login }
 
